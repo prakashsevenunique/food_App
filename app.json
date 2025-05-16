@@ -1,0 +1,79 @@
+{
+  "expo": {
+    "name": "Sustylo",
+    "slug": "Sustylo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/img/logo.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+    "googleServicesFile": "./google-services.json",
+    "splash": {
+      "image": "./assets/img/logo.png",
+      "resizeMode": "contain",
+      "dark": {
+        "image": "./assets/img/logo.png",
+        "resizeMode": "contain"
+      }
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "finunique.sustylo.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "splash": {
+        "image": "./assets/img/logo.png",
+        "resizeMode": "contain",
+        "dark": {
+          "image": "./assets/img/logo.png",
+          "resizeMode": "contain"
+        }
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/img/oo.jpg",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "finunique.sustylo.app",
+      "googleServicesFile": "./google-services.json",
+      "splash": {
+        "image": "./assets/img/logo.png",
+        "resizeMode": "contain",
+        "dark": {
+          "image": "./assets/img/logo.png",
+          "resizeMode": "contain"
+        }
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/img/logo.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/img/logo.png",
+          "color": "#FFFFFF"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "31804b91-41b1-433f-990a-777331e90e8b"
+      }
+    },
+    "owner": "prakashnative"
+  }
+}

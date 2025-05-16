@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "833393066661",
+    "project_id": "sustyloapp",
+    "storage_bucket": "sustyloapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833393066661:android:a6609fd624d1a3b14c434c",
+        "android_client_info": {
+          "package_name": "finunique.sustylo.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCW4M0CNEc4OCXOMmGgVKxRVKdmcVNpeE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

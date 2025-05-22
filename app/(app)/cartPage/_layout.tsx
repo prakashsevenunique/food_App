@@ -11,6 +11,18 @@ export default function CartLayout() {
           headerShown: false
         }}
       />
+      <Stack.Screen
+        name="checkout"
+        options={{
+          headerShown: false
+        }}
+      />
+      <Stack.Screen
+        name="orderDetail"
+        options={{
+          headerShown: false
+        }}
+      />
     </Stack>
   );
 }

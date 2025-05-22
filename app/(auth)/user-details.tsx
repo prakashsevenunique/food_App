@@ -221,7 +221,7 @@ export default function UserDetailsScreen() {
 
             setTimeout(() => {
                 router.replace('/(app)/(tabs)');
-            }, 1500);
+            }, 500);
         } catch (error) {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         } finally {

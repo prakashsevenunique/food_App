@@ -1,5 +1,6 @@
 import PolicyScreen from '@/app/(auth)/policy';
 import { Stack } from 'expo-router';
+import React from 'react';
 
 export default function ProfileLayout() {
   return (
@@ -25,49 +26,7 @@ export default function ProfileLayout() {
         }}
       />
       <Stack.Screen
-        name="referal"
-        options={{
-          headerShown: false,
-          presentation: 'modal'
-        }}
-      />
-      <Stack.Screen
-        name="myReview"
-        options={{
-          headerShown: false,
-          presentation: 'modal'
-        }}
-      />
-      <Stack.Screen
-        name="offers"
-        options={{
-          headerShown: false,
-          presentation: 'modal'
-        }}
-      />
-      <Stack.Screen
         name="setting"
-        options={{
-          headerShown: false,
-          presentation: 'modal'
-        }}
-      />
-      <Stack.Screen
-        name="raiseTicket"
-        options={{
-          headerShown: false,
-          presentation: 'modal'
-        }}
-      />
-      <Stack.Screen
-        name="helpCenter"
-        options={{
-          headerShown: false,
-          presentation: 'modal'
-        }}
-      />
-      <Stack.Screen
-        name="policies"
         options={{
           headerShown: false,
           presentation: 'modal'
@@ -81,14 +40,28 @@ export default function ProfileLayout() {
         }}
       />
       <Stack.Screen
-        name="payment_success"
+        name="favorites"
         options={{
           headerShown: false,
           presentation: 'modal'
         }}
       />
       <Stack.Screen
-        name="dashboard"
+        name="walletStatement"
+        options={{
+          headerShown: false,
+          presentation: 'modal'
+        }}
+      />
+      <Stack.Screen
+        name="paymentSuccess"
+        options={{
+          headerShown: false,
+          presentation: 'modal'
+        }}
+      />
+      <Stack.Screen
+        name="referNearn"
         options={{
           headerShown: false,
           presentation: 'modal'

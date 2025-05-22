@@ -5,15 +5,15 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 export default function ProtectedLayout() {
-  useEffect(() => {
-    async function tokenData() {
-      const fetchToken = await AsyncStorage.getItem('userData');
-      if (!fetchToken) {
-        router.replace("/welcome")
-      }
-    }
-    tokenData()
-  }, [])
+  // useEffect(() => {
+  //   async function tokenData() {
+  //     const fetchToken = await AsyncStorage.getItem('userData');
+  //     if (!fetchToken) {
+  //       router.replace("/welcome")
+  //     }
+  //   }
+  //   tokenData()
+  // }, [])
 
   return (
     <>
@@ -27,16 +27,12 @@ export default function ProtectedLayout() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="profile"
+          name="profileDetails"
           options={{ title: 'profile', headerShown: false }}
         />
         <Stack.Screen
           name="cartPage"
           options={{ title: 'cart', headerShown: false }}
-        />
-        <Stack.Screen
-          name="orderDetails"
-          options={{ title: 'orderDetails', headerShown: false }}
         />
         <Stack.Screen
           name="notification"
@@ -46,7 +42,6 @@ export default function ProtectedLayout() {
           name="resturant"
           options={{ title: 'resturant', headerShown: false }}
         />
-
       </Stack>
     </>
 

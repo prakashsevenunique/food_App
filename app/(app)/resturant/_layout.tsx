@@ -13,7 +13,14 @@ export default function ResturantLayout() {
                 }}
             />
             <Stack.Screen
-                name="edit"
+                name="rating"
+                options={{
+                    headerShown: false,
+                    presentation: 'modal'
+                }}
+            />
+            <Stack.Screen
+                name="resturantSearch"
                 options={{
                     headerShown: false,
                     presentation: 'modal'

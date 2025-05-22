@@ -46,6 +46,8 @@
     "react-native": "0.76.7",
     "react-native-confirmation-code-field": "^7.4.0",
     "react-native-gesture-handler": "~2.20.2",
+    "react-native-get-random-values": "^1.11.0",
+    "react-native-google-places-autocomplete": "^2.5.7",
     "react-native-ratings": "^8.1.0",
     "react-native-reanimated": "^3.16.2",
     "react-native-reanimated-carousel": "^4.0.2",

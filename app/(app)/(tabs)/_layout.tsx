@@ -5,7 +5,6 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons"
 import { Platform, StyleSheet, Text, View, Animated, Dimensions, TouchableOpacity } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-// Food Delivery color palette
 const COLORS = {
   primary: "#E23744", // Zomato-inspired red
   secondary: "#FC8019", // Swiggy-inspired orange
@@ -18,15 +17,12 @@ const COLORS = {
 const { width } = Dimensions.get("window")
 
 export default function TabLayout() {
-  // Animation values
   const tabAnimValue = useRef(new Animated.Value(0)).current
   const insets = useSafeAreaInsets()
 
-  // Custom Tab Bar Component
-  function CustomTabBar({ state, descriptors, navigation }) {
+  function CustomTabBar({ state, descriptors, navigation }:any) {
     const tabWidth = width / state.routes.length
 
-    // Update animation value when tab changes
     useEffect(() => {
       Animated.spring(tabAnimValue, {
         toValue: state.index * tabWidth,
@@ -38,7 +34,6 @@ export default function TabLayout() {
 
     return (
       <View style={[styles.tabBarContainer, { paddingBottom: insets.bottom }]}>
-        {/* Animated Indicator */}
         <Animated.View
           style={[
             styles.tabIndicator,
@@ -51,13 +46,11 @@ export default function TabLayout() {
           <View style={styles.activeTabBackground} />
         </Animated.View>
 
-        {/* Tab Buttons */}
-        {state.routes.map((route, index) => {
+        {state.routes.map((route : any, index:any) => {
           const { options } = descriptors[route.key]
           const label = options.tabBarLabel || options.title || route.name
           const isFocused = state.index === index
 
-          // Get the icon based on the route name
           const getTabIcon = () => {
             const iconSize = isFocused ? 24 : 22
             const iconColor = isFocused ? COLORS.primary : COLORS.textLight
@@ -71,7 +64,6 @@ export default function TabLayout() {
                 return (
                   <View>
                     <Ionicons name={isFocused ? "cart" : "cart-outline"} size={iconSize} color={iconColor} />
-                    {/* Cart badge */}
                     <View style={styles.cartBadge}>
                       <Text style={styles.cartBadgeText}>2</Text>
                     </View>
@@ -91,10 +83,7 @@ export default function TabLayout() {
                 return <Ionicons name="help-circle-outline" size={iconSize} color={iconColor} />
             }
           }
-
-          // Animation values for each tab
           const scaleAnim = useRef(new Animated.Value(1)).current
-
           const onTabPress = () => {
             Animated.sequence([
               Animated.timing(scaleAnim, {
@@ -110,10 +99,12 @@ export default function TabLayout() {
               }),
             ]).start()
 
-            // Special handling for cart tab
             if (route.name === 'cart') {
-              // Navigate to the cart page outside of tab layout
               router.push('/(app)/cartPage');
+              return;
+            }
+              if (route.name === 'explore') {
+              router.push('/(app)/resturant/resturantSearch');
               return;
             }
 
@@ -166,23 +157,19 @@ export default function TabLayout() {
       }}
       tabBar={(props) => <CustomTabBar {...props} />}
     >
-      {/* Home */}
       <Tabs.Screen
         name="index"
         options={{
           title: "Home",
         }}
       />
-
-      {/* Explore/Search */}
       <Tabs.Screen
         name="explore"
         options={{
           title: "Explore",
+          href: null,
         }}
       />
-
-      {/* Cart - Keep href: null to prevent default navigation */}
       <Tabs.Screen
         name="cart"
         options={{
@@ -190,16 +177,12 @@ export default function TabLayout() {
           href: null,
         }}
       />
-
-      {/* Orders */}
       <Tabs.Screen
         name="orders"
         options={{
           title: "Orders",
         }}
       />
-
-      {/* Profile */}
       <Tabs.Screen
         name="profile"
         options={{

@@ -34,14 +34,14 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-        <UserProvider>
-          <StatusBar
-            style={colorScheme === 'dark' ? 'light' : 'dark'}
-            backgroundColor={colorScheme === 'dark' ? '#FF5A5F' : '#FF5A5F'}
-            translucent={false}
-          />
-          <Slot />
-        </UserProvider>
+      <UserProvider>
+        <StatusBar
+          style={colorScheme === 'dark' ? 'light' : 'dark'}
+          backgroundColor={colorScheme === 'dark' ? '#FF5A5F' : '#FF5A5F'}
+          translucent={false}
+        />
+        <Slot />
+      </UserProvider>
     </GestureHandlerRootView>
   );
 }

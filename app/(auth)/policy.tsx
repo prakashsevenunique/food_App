@@ -3,17 +3,14 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import TermsAndConditions from '../(app)/profile/policies/term&condition';
-import PrivacyPolicy from '../(app)/profile/policies';
-import AboutUs from '../(app)/profile/policies/about_us';
+
 
 export default function PolicyScreen() {
     const { policyType } = useLocalSearchParams();
     if (policyType === "privacyPolicy") {
         return (
             <View className="flex-1 bg-white">
-               
-                <PrivacyPolicy />
+
             </View>
         );
     }
@@ -28,7 +25,6 @@ export default function PolicyScreen() {
                     </TouchableOpacity>
                     <Text className="text-white text-lg font-bold ml-2">Terms and Conditions</Text>
                 </View>
-                <TermsAndConditions />
             </View>
         );
     }
@@ -43,7 +39,6 @@ export default function PolicyScreen() {
                     </TouchableOpacity>
                     <Text className="text-white text-lg font-bold ml-2">Content Policy</Text>
                 </View>
-<AboutUs/>
             </View>
         );
     }

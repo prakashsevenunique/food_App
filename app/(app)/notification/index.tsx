@@ -4,25 +4,29 @@ import { router } from "expo-router"
 import { Ionicons, MaterialIcons } from "@expo/vector-icons"
 import { UserContext } from "@/hooks/userInfo"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { LinearGradient } from "expo-linear-gradient"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import React from "react"
 
-const colors = {
-  primary: "#E65305", // Bright red-orange as primary
-  primaryLight: "#FF7A3D", // Lighter version of primary
-  secondary: "#FBA059", // Light orange as secondary
-  secondaryLight: "#FFC59F",
-  tertiary: "#F4A36C", // Peach/salmon as tertiary
-  tertiaryLight: "#FFD0B0", // Lighter version of tertiary
-  background: "#FFF9F5",
-  cardBg: "#FFFFFF", // White for cards
-  text: "#3D2C24", // Dark brown for text
-  textLight: "#7D6E66", // Lighter text color
-  textLighter: "#A99E98", // Even lighter text
-  divider: "#FFE8D6",
+// Food Delivery color palette
+const COLORS = {
+  primary: "#E23744", // Zomato-inspired red
+  primaryDark: "#D32F2F", // Darker shade for gradient
+  primaryLight: "#FF5A5F", // Lighter shade for gradient
+  secondary: "#FC8019", // Swiggy-inspired orange
+  accent: "#60B246", // Green for success/confirmation
+  background: "#FFFFFF",
+  textDark: "#3D4152",
+  textLight: "#93959F",
+  lightGray: "#F8F8F8",
+  gray: "#EEEEEE",
+  border: "#E8E8E8",
 }
 
 const NotificationScreen = () => {
   const { notification } = useContext(UserContext) as any
   const [notifications, setNotifications] = useState([])
+  const insets = useSafeAreaInsets()
 
   useEffect(() => {
     const loadNotifications = async () => {
@@ -78,7 +82,7 @@ const NotificationScreen = () => {
         type: notificationType,
         title: content?.title || "New Notification",
         message: content?.body || "",
-        url : content?.data?.url || "",
+        url: content?.data?.url || "",
         time: timeString,
         read: false,
         icon: getIconForNotificationType(notificationType),
@@ -97,7 +101,7 @@ const NotificationScreen = () => {
   const getIconForNotificationType = (type) => {
     switch (type) {
       case "offer":
-        return "tag"
+        return "local-offer"
       case "appointment":
         return "calendar-today"
       case "payment":
@@ -108,6 +112,10 @@ const NotificationScreen = () => {
         return "event-available"
       case "reminder":
         return "alarm"
+      case "order":
+        return "restaurant"
+      case "delivery":
+        return "delivery-dining"
       default:
         return "notifications"
     }
@@ -131,16 +139,20 @@ const NotificationScreen = () => {
   const getIconColor = (type) => {
     switch (type) {
       case "offer":
-        return colors.primary // Primary orange-red
+        return COLORS.primary // Primary red
       case "appointment":
       case "booking":
-        return colors.secondary // Secondary orange
+        return COLORS.secondary // Secondary orange
       case "payment":
-        return colors.tertiary // Tertiary peach
+        return "#4CAF50" // Green for payments
+      case "order":
+        return COLORS.primary // Primary red for orders
+      case "delivery":
+        return COLORS.secondary // Secondary orange for delivery
       case "reminder":
-        return colors.accent || colors.secondary // Accent color
+        return "#2196F3" // Blue for reminders
       default:
-        return colors.textLight // Medium brown
+        return COLORS.textLight // Medium gray
     }
   }
 
@@ -162,42 +174,45 @@ const NotificationScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Header */}
-      <View
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+      <LinearGradient
+        colors={["#FF5A5F", "#FF5A5F", "#FF7B7F"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
         style={{
-          backgroundColor: colors.cardBg,
+          paddingTop: insets.top,
           paddingHorizontal: 16,
-          paddingVertical: 16,
-          shadowColor: colors.primary,
+          paddingBottom: 16,
+          shadowColor: "#000",
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.1,
           shadowRadius: 4,
-          elevation: 2,
+          elevation: 5,
         }}
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        <View className="py-1 pt-3" style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} color={colors.primary} />
+              <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
-            <Text style={{ fontSize: 20, fontWeight: "bold", marginLeft: 16, color: colors.text }}>Notifications</Text>
+            <Text style={{ fontSize: 20, fontWeight: "bold", marginLeft: 16, color: "#fff" }}>
+              Notifications
+            </Text>
           </View>
           <TouchableOpacity onPress={clearAllNotifications}>
-            <Text style={{ color: colors.primary, fontWeight: "500" }}>Clear All</Text>
+            <Text style={{ color: "#fff", fontWeight: "500" }}>Clear All</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
 
-      {/* Notification List */}
       <ScrollView style={{ flex: 1, paddingHorizontal: 12, paddingVertical: 8 }}>
         {notifications.length === 0 ? (
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 80 }}>
-            <MaterialIcons name="notifications-off" size={48} color={colors.tertiaryLight} />
-            <Text style={{ color: colors.textLight, fontSize: 18, marginTop: 16, fontWeight: "500" }}>
+            <MaterialIcons name="notifications-off" size={48} color={COLORS.gray} />
+            <Text style={{ color: COLORS.textDark, fontSize: 18, marginTop: 16, fontWeight: "500" }}>
               No notifications yet
             </Text>
-            <Text style={{ color: colors.textLighter, marginTop: 4, textAlign: "center" }}>
+            <Text style={{ color: COLORS.textLight, marginTop: 4, textAlign: "center" }}>
               We'll notify you when there's something new
             </Text>
           </View>
@@ -206,52 +221,69 @@ const NotificationScreen = () => {
             <TouchableOpacity
               key={notification.id}
               style={{
-                backgroundColor: colors.cardBg,
+                backgroundColor: COLORS.background,
                 borderRadius: 12,
                 padding: 16,
                 marginBottom: 12,
-                shadowColor: colors.primary,
+                shadowColor: COLORS.textDark,
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.05,
                 shadowRadius: 4,
                 elevation: 1,
                 borderLeftWidth: !notification.read ? 4 : 0,
-                borderLeftColor: !notification.read ? colors.primary : "transparent",
+                borderLeftColor: !notification.read ? COLORS.primary : "transparent",
+                borderWidth: 1,
+                borderColor: COLORS.border,
               }}
-              onPress={() => {markAsRead(notification.id); notification.url ? Linking.openURL(notification.url) : null}}
+              onPress={() => {
+                markAsRead(notification.id)
+                notification.url ? Linking.openURL(notification.url) : null
+              }}
             >
               <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
-                <View style={{ marginRight: 12 }}>
-                  <MaterialIcons name={notification.icon} size={24} color={getIconColor(notification.type)} />
+                <View
+                  style={{
+                    marginRight: 12,
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: `${getIconColor(notification.type)}15`,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <MaterialIcons name={notification.icon} size={22} color={getIconColor(notification.type)} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <Text
                       style={{
                         fontWeight: "bold",
-                        color: !notification.read ? colors.text : colors.textLight,
+                        color: !notification.read ? COLORS.textDark : COLORS.textLight,
+                        fontSize: 16,
                       }}
                     >
                       {notification.title}
                     </Text>
-                    <Text style={{ fontSize: 12, color: colors.textLighter }}>{notification.time}</Text>
+                    <Text style={{ fontSize: 12, color: COLORS.textLight }}>{notification.time}</Text>
                   </View>
                   <Text
                     style={{
                       marginTop: 4,
-                      color: !notification.read ? colors.textLight : colors.textLighter,
+                      color: !notification.read ? COLORS.textDark : COLORS.textLight,
+                      fontSize: 14,
                     }}
                   >
                     {notification.message}
                   </Text>
                   {!notification.read && (
-                    <View style={{ marginTop: 8 }}>
+                    <View style={{ marginTop: 8, alignItems: "flex-end" }}>
                       <View
                         style={{
                           width: 8,
                           height: 8,
                           borderRadius: 4,
-                          backgroundColor: colors.primary,
+                          backgroundColor: COLORS.primary,
                         }}
                       />
                     </View>
@@ -264,14 +296,15 @@ const NotificationScreen = () => {
       </ScrollView>
       <View
         style={{
-          backgroundColor: colors.cardBg,
+          backgroundColor: COLORS.background,
           borderTopWidth: 1,
-          borderTopColor: colors.divider,
+          borderTopColor: COLORS.border,
           paddingHorizontal: 16,
-          paddingVertical: 8,
+          paddingVertical: 12,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
         }}
       >
-        <Text style={{ textAlign: "center", color: colors.textLight, fontSize: 14 }}>
+        <Text style={{ textAlign: "center", color: COLORS.textLight, fontSize: 14 }}>
           {notifications.filter((n) => !n.read).length} unread notifications
         </Text>
       </View>

@@ -211,7 +211,7 @@ export default function OtpVerificationScreen() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             console.log(isNewUser)
             
-            if (isNewUser === "true") {
+            if (isNewUser == "true") {
                 router.push({
                     pathname: '/user-details',
                     params: { mobile }

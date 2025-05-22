@@ -204,7 +204,6 @@ export default function CartScreen() {
   }
 
   const handleCheckout = () => {
-    // Checkout button animation
     Animated.sequence([
       Animated.timing(checkoutBtnAnim, {
         toValue: 0.95,
@@ -220,11 +219,8 @@ export default function CartScreen() {
     ]).start()
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+    router.push("/(app)/cartPage/checkout")
 
-    // Navigate to checkout
-    setTimeout(() => {
-      router.push("/(tabs)/orders")
-    }, 300)
   }
 
   function triggerHaptic(intensity) {
@@ -251,18 +247,11 @@ export default function CartScreen() {
           className="absolute top-0 left-0 right-0 h-full"
         />
         <View className="flex-row items-center px-3">
-          <TouchableOpacity
-            className="z-20 bg-white/20 p-1.5 rounded-full"
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.back();
-            }}
-          >
-            <Ionicons name="chevron-back" size={22} color="white" />
+          <TouchableOpacity onPress={() => router.back()} className="mx-2">
+            <Ionicons name="arrow-back" size={24} color='white' />
           </TouchableOpacity>
-          <View className="px-2 py-2">
+          <View className="px-2 py-4">
             <Text className="text-2xl font-bold text-white">My Cart</Text>
-            <Text className="text-sm text-white/80 mt-1">Track and manage your Cart</Text>
           </View>
         </View>
       </View>

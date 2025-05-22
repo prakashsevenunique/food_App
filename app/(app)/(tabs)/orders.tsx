@@ -7,7 +7,6 @@ import { router } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
 import React from "react"
 
-// Food Delivery color palette
 const COLORS = {
   primary: "#E23744", // Zomato-inspired red
   secondary: "#FC8019", // Swiggy-inspired orange
@@ -18,10 +17,8 @@ const COLORS = {
   lightGray: "#F8F8F8",
   gray: "#EEEEEE",
 }
-
 const { width } = Dimensions.get("window")
 
-// Sample orders data
 const ORDERS = [
   {
     id: "ORD12345",
@@ -112,19 +109,13 @@ export default function OrdersScreen() {
   const [activeTab, setActiveTab] = useState("active")
   const [expandedOrder, setExpandedOrder] = useState(null)
 
-  // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current
   const slideAnim = useRef(new Animated.Value(30)).current
   const expandedOrderAnim = useRef(new Animated.Value(0)).current
-
-  // Tab indicator animation
   const tabIndicatorAnim = useRef(new Animated.Value(0)).current
-
-  // Order item animations
   const orderAnimations = useRef(ORDERS.map(() => new Animated.Value(0))).current
 
   useEffect(() => {
-    // Initial animations
     Animated.stagger(200, [
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -139,7 +130,6 @@ export default function OrdersScreen() {
       }),
     ]).start()
 
-    // Animate order items
     Animated.stagger(
       150,
       orderAnimations.map((anim) =>
@@ -154,7 +144,6 @@ export default function OrdersScreen() {
   }, [])
 
   useEffect(() => {
-    // Animate tab indicator
     Animated.spring(tabIndicatorAnim, {
       toValue: activeTab === "active" ? 0 : 1,
       friction: 8,
@@ -163,16 +152,15 @@ export default function OrdersScreen() {
     }).start()
   }, [activeTab])
 
-  const handleTabPress = (tab) => {
+  const handleTabPress = (tab:any) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
     setActiveTab(tab)
   }
 
-  const handleOrderPress = (orderId) => {
+  const handleOrderPress = (orderId:any) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
 
     if (expandedOrder === orderId) {
-      // Animate out
       Animated.timing(expandedOrderAnim, {
         toValue: 0,
         duration: 200,
@@ -182,7 +170,6 @@ export default function OrdersScreen() {
       })
     } else {
       setExpandedOrder(orderId)
-      // Animate in
       Animated.timing(expandedOrderAnim, {
         toValue: 1,
         duration: 300,
@@ -195,7 +182,7 @@ export default function OrdersScreen() {
     activeTab === "active" ? order.status === "active" : order.status === "completed",
   )
 
-  const renderOrderItem = ({ item, index }) => (
+  const renderOrderItem = ({ item, index }:any) => (
     <Animated.View
       style={{
         opacity: orderAnimations[index],
@@ -220,7 +207,6 @@ export default function OrdersScreen() {
             elevation: 3,
           }}
         >
-          {/* Order Header */}
           <View className="p-4 border-b border-[#F0F0F0]">
             <View className="flex-row justify-between items-center">
               <View className="flex-row items-center">
@@ -261,7 +247,6 @@ export default function OrdersScreen() {
             </View>
           </View>
 
-          {/* Order Details (Expanded) */}
           {expandedOrder === item.id && (
             <Animated.View
               className="p-4"
@@ -279,7 +264,6 @@ export default function OrdersScreen() {
             >
               <Text className="font-bold text-sm mb-3 text-[#3D4152]">Order Tracking</Text>
 
-              {/* Tracking Steps */}
               <View className="mb-4">
                 {item.trackingSteps.map((step, stepIndex) => (
                   <View key={stepIndex} className="flex-row mb-4 last:mb-0">
@@ -295,7 +279,6 @@ export default function OrdersScreen() {
                           <View className="w-2 h-2 rounded-full bg-[#93959F]" />
                         )}
                       </View>
-
                       {stepIndex < item.trackingSteps.length - 1 && (
                         <View
                           className={`w-0.5 h-10 ${
@@ -306,7 +289,6 @@ export default function OrdersScreen() {
                         />
                       )}
                     </View>
-
                     <View className="flex-1">
                       <Text className={`font-medium ${step.completed ? "text-[#3D4152]" : "text-[#93959F]"}`}>
                         {step.title}
@@ -317,12 +299,10 @@ export default function OrdersScreen() {
                 ))}
               </View>
 
-              {/* Action Buttons */}
               <View className="flex-row mt-2">
                 <TouchableOpacity
                   onPress={() => {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-                    // Help with order
                   }}
                   className="flex-1 mr-2 py-2 rounded-xl items-center justify-center bg-[#F8F8F8]"
                 >
@@ -333,7 +313,7 @@ export default function OrdersScreen() {
                   <TouchableOpacity
                     onPress={() => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      router.push("/(app)/orderDetails")
+                      router.push("/(app)/cartPage/orderDetail")
                     }}
                     className="flex-1 ml-2 py-2 rounded-xl items-center justify-center overflow-hidden"
                   >

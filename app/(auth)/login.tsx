@@ -160,6 +160,8 @@ export default function LoginScreen() {
       const response = await axiosInstance.post('/api/users/send-otp', {
         mobileNumber: mobile
       });
+
+      console.log('OTP sent successfully:', response.data);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.push({
         pathname: '/otp-verification',

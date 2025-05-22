@@ -4,8 +4,8 @@ import { Ionicons, Feather, FontAwesome } from "@expo/vector-icons"
 import { useContext, useState } from "react"
 import { UserContext } from "@/hooks/userInfo"
 import { imageBaseUrl } from "@/utils/helpingData"
+import React from "react"
 
-// Su stylo Salon color palette - lighter shades
 const colors = {
   primary: "#E65305", // Bright red-orange as primary
   primaryLight: "#FF7A3D", // Lighter version of primary
@@ -163,7 +163,7 @@ export default function ProfileScreen() {
             { name: "My Wallet", icon: "rupes", route: "/profile/wallet" },
             { name: "Manage Address", icon: "map-pin", route: "/profile/address" },
             { name: "My Reviews", icon: "thumbs-up", route: "/profile/myReview" },
-            { name: userInfo?.role == 'user'? "Be our Partner":"Dashboard", icon: "airplay", route: "/profile/dashboard" },
+            { name: userInfo?.role == 'user' ? "Be our Partner" : "Dashboard", icon: "airplay", route: "/profile/dashboard" },
 
           ].map((item, index) => (
             <TouchableOpacity

@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import axiosInstance from '@/utils/axiosInstance';
 import { UserContext } from '@/hooks/userInfo';
+import { imageBaseUrl } from '@/utils/helpingData';
 
 const { width, height } = Dimensions.get('window');
 
@@ -78,7 +79,7 @@ export default function UserDetailsScreen() {
             const timer = setTimeout(() => {
                 setSaveSuccess(false);
                 successAnim.setValue(0);
-            }, 3000);
+            }, 1000);
 
             return () => clearTimeout(timer);
         }
@@ -93,9 +94,9 @@ export default function UserDetailsScreen() {
                 },
             });
             if (response.data) {
-                setName(response.data?.data?.name || '');
-                setEmail(response.data?.data?.email || '');
-                setProfileImage(response.data?.data?.profileImage || null);
+                setName(response.data?.user?.fullName || '');
+                setEmail(response.data?.user?.email || '');
+                setProfileImage(`${imageBaseUrl}/${response.data?.user?.profilePicture}` || null);
             }
         } catch (error) {
             console.log(error.message)
@@ -160,6 +161,7 @@ export default function UserDetailsScreen() {
 
         if (!result.canceled) {
             setProfileImage(result.assets[0].uri);
+            await uploadProfileImage(result.assets[0].uri);
         }
     };
 
@@ -186,26 +188,9 @@ export default function UserDetailsScreen() {
 
         setLoading(true);
         try {
-            const formData = new FormData();
-            formData.append('mobileNumber', mobile);
-            formData.append('name', name);
-            formData.append('email', email);
 
-            if (profileImage && profileImage.startsWith('file://')) {
-                const filename = profileImage.split('/').pop();
-                const match = /\.(\w+)$/.exec(filename || '');
-                const type = match ? `image/${match[1]}` : 'image';
-
-                formData.append('profilePicture', {
-                    uri: profileImage,
-                    name: filename,
-                    type,
-                } as any);
-            }
-
-            await axiosInstance.put('/api/users/profile', formData, {
+            let response = await axiosInstance.put('/api/users/profile/text', { name, email }, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`
                 },
             });
@@ -221,11 +206,31 @@ export default function UserDetailsScreen() {
 
             setTimeout(() => {
                 router.replace('/(app)/(tabs)');
-            }, 500);
+            }, 100);
         } catch (error) {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const uploadProfileImage = async (uri) => {
+        const formData = new FormData();
+        formData.append('profilePicture', {
+            uri,
+            name: 'profile.jpg',
+            type: 'image/jpeg',
+        });
+
+        try {
+            await axiosInstance.put('/api/users/profile/photo', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
+                },
+            });
+        } catch (error) {
+            console.error('Upload error:', error.response.data);
         }
     };
 

@@ -209,8 +209,6 @@ export default function OtpVerificationScreen() {
             await AsyncStorage.setItem('userData', JSON.stringify(response.data?.data?.token));
             setToken(response.data?.data?.token);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            console.log(isNewUser)
-            
             if (isNewUser == "true") {
                 router.push({
                     pathname: '/user-details',

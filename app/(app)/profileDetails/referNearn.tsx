@@ -1,455 +1,364 @@
-import { useEffect, useRef, useState } from "react"
+import { useContext, useRef, useEffect } from "react"
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
+  ScrollView,
   Image,
-  StyleSheet,
+  Share,
+  Linking,
+  Alert,
   Animated,
   Dimensions,
-  ActivityIndicator,
-  StatusBar,
-  TextInput,
-  Share,
+  StyleSheet,
   Platform,
+  StatusBar
 } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import * as Haptics from "expo-haptics"
 import { router } from "expo-router"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { LinearGradient } from "expo-linear-gradient"
+import { Ionicons, Feather, MaterialIcons, FontAwesome5 } from "@expo/vector-icons"
+import { UserContext } from "@/hooks/userInfo"
 import * as Clipboard from "expo-clipboard"
+import React from "react"
+import { LinearGradient } from "expo-linear-gradient"
+import * as Haptics from "expo-haptics"
 
 const { width } = Dimensions.get("window")
 
-const COLORS = {
-  primary: "#FF5A5F",
-  secondary: "#FFB74D",
-  tertiary: "#4CAF50",
-  accent1: "#8E24AA",
-  accent2: "#1E88E5",
-  dark: "#263238",
-  light: "#FFFFFF",
-  background: "#F9F9F9",
-  card: "#FFFFFF",
-  text: "#263238",
-  textLight: "#78909C",
-  success: "#66BB6A",
-  error: "#EF5350",
-  warning: "#FFA000",
-  gradient1: ["#FF5A5F", "#FF8A65"],
-  gradient2: ["#FFB74D", "#FFA000"],
-  gradient3: ["#4CAF50", "#2E7D32"],
-  gradient4: ["#8E24AA", "#6A1B9A"],
-  gradient5: ["#1E88E5", "#1565C0"],
+// Su stylo Salon color palette - enhanced
+const colors = {
+  primary: "#E65305", // Bright red-orange as primary
+  primaryLight: "#FF7A3D", // Lighter version of primary
+  primaryLighter: "#FFA273", // Even lighter version
+  primaryGradient: ["#E65305", "#FF7A3D"],
+  secondary: "#FBA059", // Light orange as secondary
+  secondaryLight: "#FFC59F", // Lighter version of secondary
+  accent: "#FB8807", // Bright orange as accent
+  accentLight: "#FFAA4D", // Lighter version of accent
+  tertiary: "#F4A36C", // Peach/salmon as tertiary
+  tertiaryLight: "#FFD0B0", // Lighter version of tertiary
+  background: "#FFF9F5", // Very light orange/peach background
+  cardBg: "#FFFFFF", // White for cards
+  text: "#3D2C24", // Dark brown for text
+  textLight: "#7D6E66", // Lighter text color
+  textLighter: "#A99E98", // Even lighter text
+  divider: "#FFE8D6", // Very light divider color
+  success: "#4CAF50", // Green for success messages
 }
 
-// Mock referral data - in a real app, this would come from your API
-const mockReferralData = {
-  referralCode: "FOODIE123",
-  referralLink: "https://foodapp.com/ref/FOODIE123",
-  creditsPerReferral: 10,
-  totalEarned: 30,
-  pendingCredits: 10,
-  referrals: [
-    {
-      id: "ref1",
-      name: "John Doe",
-      date: "2023-05-10T14:30:00Z",
-      status: "completed",
-      credits: 10,
-    },
-    {
-      id: "ref2",
-      name: "Jane Smith",
-      date: "2023-05-15T10:15:00Z",
-      status: "completed",
-      credits: 10,
-    },
-    {
-      id: "ref3",
-      name: "Mike Johnson",
-      date: "2023-05-18T16:45:00Z",
-      status: "completed",
-      credits: 10,
-    },
-    {
-      id: "ref4",
-      name: "Sarah Williams",
-      date: "2023-05-20T09:30:00Z",
-      status: "pending",
-      credits: 10,
-    },
-  ],
-  howItWorks: [
-    "Invite friends using your unique referral code",
-    "Your friend gets $10 off their first order",
-    "You get $10 when they complete their first order",
-    "There's no limit to how many friends you can refer",
-  ],
-}
+export default function ReferAndEarnScreen() {
+  const { userInfo } = useContext(UserContext) as any
+  const referralLink = `https://play.google.com/store/apps/details?id=finunique.sustylo.app?code=${userInfo?.referralCode}`
 
-export default function ReferEarnScreen() {
-  const insets = useSafeAreaInsets()
-  const [referralData, setReferralData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [copiedText, setCopiedText] = useState("")
-  const [showCopiedMessage, setShowCopiedMessage] = useState(false)
-
+  // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current
-  const slideAnim = useRef(new Animated.Value(20)).current
-  const bounceAnim = useRef(new Animated.Value(1)).current
+  const slideAnim = useRef(new Animated.Value(30)).current
+  const scaleAnim = useRef(new Animated.Value(0.9)).current
 
-  // Fetch referral data
   useEffect(() => {
-    fetchReferralData()
-  }, [])
-
-  const fetchReferralData = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      // In a real app, you would fetch from your API
-      // const response = await api.get('/user/referrals')
-      // const data = response.data
-
-      // Using mock data for demonstration
-      setTimeout(() => {
-        setReferralData(mockReferralData)
-        setLoading(false)
-      }, 1000)
-    } catch (err) {
-      console.error("Failed to fetch referral data:", err)
-      setError(err.message || "Failed to load referral data")
-      setLoading(false)
-    }
-  }
-
-  // Animations
-  useEffect(() => {
-    if (!loading && referralData) {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 400,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]).start()
-    }
-  }, [loading, referralData])
-
-  const triggerHaptic = (type = "light") => {
-    switch (type) {
-      case "light":
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-        break
-      case "medium":
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-        break
-      case "heavy":
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
-        break
-      case "success":
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
-        break
-      case "error":
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
-        break
-      default:
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-    }
-  }
-
-  const handleBack = () => {
-    triggerHaptic("light")
-    router.back()
-  }
-
-  const copyToClipboard = async (text) => {
-    triggerHaptic("success")
-    await Clipboard.setStringAsync(text)
-    setCopiedText(text)
-    setShowCopiedMessage(true)
-
-    // Animate the bounce effect
-    Animated.sequence([
-      Animated.timing(bounceAnim, {
-        toValue: 1.1,
-        duration: 100,
+    // Start animations when component mounts
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
         useNativeDriver: true,
       }),
-      Animated.timing(bounceAnim, {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
         toValue: 1,
-        duration: 100,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start()
+  }, [])
+
+  const handleShare = async () => {
+    try {
+      triggerHaptic("medium")
+      const message = `Hey! Use my referral code ${userInfo?.referralCode} to get ₹100 off on Su Stylo Salon app. Sign up using this link: ${referralLink}`
+      await Share.share({
+        message,
+        title: "Get ₹100 off on Su Stylo Salon!",
+      })
+    } catch (error) {
+      console.error("Error sharing:", error.message)
+    }
+  }
+
+  const handleCopyCode = () => {
+    triggerHaptic("success")
+    const referralCode = userInfo?.referralCode || "SUSTYLO100"
+    Clipboard.setString(referralCode)
+
+    // Show success animation instead of alert
+    showCopiedAnimation()
+  }
+
+  const showCopiedAnimation = () => {
+    // Create a temporary animated value for the copied animation
+    const tempScale = new Animated.Value(1)
+
+    Animated.sequence([
+      Animated.timing(tempScale, {
+        toValue: 1.1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(tempScale, {
+        toValue: 1,
+        duration: 150,
         useNativeDriver: true,
       }),
     ]).start()
 
-    // Hide the copied message after 2 seconds
-    setTimeout(() => {
-      setShowCopiedMessage(false)
-    }, 2000)
+    // Show toast or some visual feedback
+    Alert.alert("Success", "Referral code copied to clipboard!")
   }
 
-  const handleShare = async () => {
-    triggerHaptic("medium")
-    try {
-      const result = await Share.share({
-        message: `Use my referral code ${referralData.referralCode} to get $10 off your first order on FoodApp! Download now: ${referralData.referralLink}`,
-      })
-    } catch (error) {
-      console.error("Error sharing:", error)
+  const triggerHaptic = (type = "light") => {
+    if (Platform.OS === "ios" || Platform.OS === "android") {
+      switch (type) {
+        case "light":
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+          break
+        case "medium":
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+          break
+        case "success":
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+          break
+        default:
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+      }
     }
   }
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
-  }
+  const handleSocialShare = (platform) => {
+    triggerHaptic("light")
 
-  if (loading) {
-    return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Refer & Earn</Text>
-          <View style={{ width: 24 }} />
-        </View>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>Loading referral data...</Text>
-        </View>
-      </View>
-    )
-  }
-
-  if (error) {
-    return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Refer & Earn</Text>
-          <View style={{ width: 24 }} />
-        </View>
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color={COLORS.error} />
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={fetchReferralData}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    )
-  }
-
-  if (!referralData) {
-    return null
+    switch (platform) {
+      case "whatsapp":
+        Linking.openURL(
+          `whatsapp://send?text=Hey! Use my referral code ${userInfo?.referralCode || "SUSTYLO100"} to get ₹100 off on Su Stylo Salon app! ${referralLink}`
+        )
+        break
+      case "sms":
+        Linking.openURL(
+          `sms:?body=Hey! Use my referral code ${userInfo?.referralCode || "SUSTYLO100"} to get ₹100 off on Su Stylo Salon app! ${referralLink}`
+        )
+        break
+      case "email":
+        Linking.openURL(
+          `mailto:?subject=Get ₹100 off at Su Stylo Salon!&body=Hey! Use my referral code ${userInfo?.referralCode || "SUSTYLO100"} to get ₹100 off on Su Stylo Salon app! ${referralLink}`
+        )
+        break
+      default:
+        handleShare()
+    }
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Refer & Earn</Text>
-        <View style={{ width: 24 }} />
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor={'#F9F9F9'} />
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={()=>router.back()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={'#263238'} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Refer and Earn</Text>
+          <View style={{ width: 24 }} />
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Hero Section */}
         <Animated.View
           style={[
-            styles.content,
+            styles.heroContainer,
             {
               opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
+              transform: [
+                { translateY: slideAnim },
+                { scale: scaleAnim }
+              ]
+            }
           ]}
         >
-          {/* Hero Section */}
-          <View style={styles.heroContainer}>
-            <LinearGradient
-              colors={COLORS.gradient1}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.heroGradient}
-            >
-              <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1488330890490-c291ecf62571?w=500&h=500&fit=crop",
-                }}
-                style={styles.heroImage}
-              />
-              <View style={styles.heroContent}>
-                <Text style={styles.heroTitle}>Invite Friends & Earn</Text>
-                <Text style={styles.heroSubtitle}>
-                  Get ${referralData.creditsPerReferral} for each friend who joins and orders
-                </Text>
-              </View>
-            </LinearGradient>
-          </View>
+          <LinearGradient
+            colors={['#FFC59F', '#FFD0B0']}
+            style={styles.heroGradient}
+          >
+            <Image
+              source={{ uri: "https://cdn-icons-png.flaticon.com/512/3132/3132693.png" }}
+              style={styles.heroImage}
+            />
+            <View style={styles.heroTextContainer}>
+              <Text style={styles.heroTitle}>Earn ₹100 for each friend!</Text>
+              <Text style={styles.heroSubtitle}>
+                Invite your friends to join Su Stylo Salon and get ₹100 in your wallet for every successful referral.
+              </Text>
+            </View>
+          </LinearGradient>
+        </Animated.View>
 
-          {/* Referral Code Section */}
+        {/* Your Referral Code */}
+        <Animated.View
+          style={[
+            styles.referralCodeContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }]
+            }
+          ]}
+        >
+          <Text style={styles.referralCodeLabel}>Your referral code</Text>
           <View style={styles.codeContainer}>
-            <Text style={styles.codeLabel}>Your Referral Code</Text>
-            <View style={styles.codeWrapper}>
-              <Animated.View
-                style={[
-                  styles.codeBox,
-                  {
-                    transform: [{ scale: showCopiedMessage && copiedText === referralData.referralCode ? bounceAnim : 1 }],
-                  },
-                ]}
-              >
-                <Text style={styles.codeText}>{referralData.referralCode}</Text>
-                <TouchableOpacity
-                  style={styles.copyButton}
-                  onPress={() => copyToClipboard(referralData.referralCode)}
-                >
-                  <Ionicons
-                    name={
-                      showCopiedMessage && copiedText === referralData.referralCode ? "checkmark-outline" : "copy-outline"
-                    }
-                    size={20}
-                    color={
-                      showCopiedMessage && copiedText === referralData.referralCode ? COLORS.success : COLORS.primary
-                    }
-                  />
-                </TouchableOpacity>
-              </Animated.View>
-              {showCopiedMessage && copiedText === referralData.referralCode && (
-                <Text style={styles.copiedMessage}>Copied to clipboard!</Text>
-              )}
-            </View>
-          </View>
-
-          {/* Share Options */}
-          <View style={styles.shareContainer}>
-            <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-              <LinearGradient
-                colors={COLORS.gradient1}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.shareButtonGradient}
-              >
-                <Ionicons name="share-social" size={20} color={COLORS.light} />
-                <Text style={styles.shareButtonText}>Share with Friends</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-
-          {/* Stats Section */}
-          <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>${referralData.totalEarned}</Text>
-              <Text style={styles.statLabel}>Total Earned</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>${referralData.pendingCredits}</Text>
-              <Text style={styles.statLabel}>Pending</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>{referralData.referrals.length}</Text>
-              <Text style={styles.statLabel}>Referrals</Text>
-            </View>
-          </View>
-
-          {/* How It Works Section */}
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>How It Works</Text>
-            <View style={styles.howItWorksContainer}>
-              {referralData.howItWorks.map((step, index) => (
-                <View key={index} style={styles.stepContainer}>
-                  <View style={styles.stepNumberContainer}>
-                    <Text style={styles.stepNumber}>{index + 1}</Text>
-                  </View>
-                  <Text style={styles.stepText}>{step}</Text>
+            <View style={styles.codeBox}>
+              {(userInfo?.referralCode || "SUSTYLO100").split('').map((char, index) => (
+                <View key={index} style={styles.codeCharBox}>
+                  <Text style={styles.codeChar}>{char}</Text>
                 </View>
               ))}
             </View>
-          </View>
-
-          {/* Referral History Section */}
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Referral History</Text>
-            {referralData.referrals.length > 0 ? (
-              <View style={styles.referralHistoryContainer}>
-                {referralData.referrals.map((referral) => (
-                  <View key={referral.id} style={styles.referralItem}>
-                    <View style={styles.referralUserInfo}>
-                      <View style={styles.referralAvatar}>
-                        <Text style={styles.referralAvatarText}>{referral.name.charAt(0)}</Text>
-                      </View>
-                      <View style={styles.referralDetails}>
-                        <Text style={styles.referralName}>{referral.name}</Text>
-                        <Text style={styles.referralDate}>{formatDate(referral.date)}</Text>
-                      </View>
-                    </View>
-                    <View style={styles.referralStatusContainer}>
-                      <View
-                        style={[
-                          styles.statusBadge,
-                          {
-                            backgroundColor:
-                              referral.status === "completed" ? COLORS.success + "20" : COLORS.warning + "20",
-                          },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.statusText,
-                            {
-                              color: referral.status === "completed" ? COLORS.success : COLORS.warning,
-                            },
-                          ]}
-                        >
-                          {referral.status === "completed" ? "Completed" : "Pending"}
-                        </Text>
-                      </View>
-                      <Text style={styles.referralCredits}>+${referral.credits}</Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            ) : (
-              <View style={styles.emptyReferralsContainer}>
-                <Ionicons name="people-outline" size={48} color={COLORS.textLight} />
-                <Text style={styles.emptyReferralsText}>No referrals yet</Text>
-                <Text style={styles.emptyReferralsSubtext}>Share your code to start earning</Text>
-              </View>
-            )}
-          </View>
-
-          {/* Terms and Conditions */}
-          <View style={styles.termsContainer}>
-            <Text style={styles.termsText}>
-              By participating in our referral program, you agree to our{" "}
-              <Text style={styles.termsLink}>Terms & Conditions</Text>.
-            </Text>
+            <TouchableOpacity
+              onPress={handleCopyCode}
+              style={styles.copyButton}
+            >
+              <Feather name="copy" size={16} color={colors.cardBg} />
+              <Text style={styles.copyButtonText}>Copy</Text>
+            </TouchableOpacity>
           </View>
         </Animated.View>
+
+        {/* How it works */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>How it works</Text>
+
+          <View style={styles.stepContainer}>
+            <View style={[styles.stepNumberContainer, { backgroundColor: colors.primaryLighter }]}>
+              <Text style={styles.stepNumber}>1</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Share your referral code</Text>
+              <Text style={styles.stepDescription}>Share your code with friends via WhatsApp, SMS, or other platforms.</Text>
+            </View>
+          </View>
+
+          <View style={styles.stepContainer}>
+            <View style={[styles.stepNumberContainer, { backgroundColor: colors.secondaryLight }]}>
+              <Text style={styles.stepNumber}>2</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Friend signs up</Text>
+              <Text style={styles.stepDescription}>Your friend downloads the app and signs up using your referral code.</Text>
+            </View>
+          </View>
+
+          <View style={styles.stepContainer}>
+            <View style={[styles.stepNumberContainer, { backgroundColor: colors.tertiaryLight }]}>
+              <Text style={styles.stepNumber}>3</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>Both of you get rewarded</Text>
+              <Text style={styles.stepDescription}>Your friend gets ₹100 on signup, and you get ₹100 when they complete their first appointment.</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Share Options */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Share via</Text>
+          <View style={styles.shareOptionsContainer}>
+            <TouchableOpacity
+              onPress={() => handleSocialShare("whatsapp")}
+              style={styles.shareOption}
+            >
+              <View style={[styles.shareIconContainer, { backgroundColor: "#25D366" }]}>
+                <Ionicons name="logo-whatsapp" size={24} color="#FFFFFF" />
+              </View>
+              <Text style={styles.shareOptionText}>WhatsApp</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleSocialShare("sms")}
+              style={styles.shareOption}
+            >
+              <View style={[styles.shareIconContainer, { backgroundColor: "#2196F3" }]}>
+                <MaterialIcons name="sms" size={24} color="#FFFFFF" />
+              </View>
+              <Text style={styles.shareOptionText}>SMS</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleSocialShare("email")}
+              style={styles.shareOption}
+            >
+              <View style={[styles.shareIconContainer, { backgroundColor: "#EA4335" }]}>
+                <MaterialIcons name="email" size={24} color="#FFFFFF" />
+              </View>
+              <Text style={styles.shareOptionText}>Email</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleShare}
+              style={styles.shareOption}
+            >
+              <View style={[styles.shareIconContainer, { backgroundColor: colors.primary }]}>
+                <Feather name="share-2" size={24} color="#FFFFFF" />
+              </View>
+              <Text style={styles.shareOptionText}>More</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Terms and Conditions */}
+        <View style={styles.termsContainer}>
+          <Text style={styles.termsTitle}>Terms & Conditions</Text>
+          <View style={styles.termsList}>
+            <View style={styles.termItem}>
+              <View style={styles.termBullet} />
+              <Text style={styles.termText}>Offer valid for new users only</Text>
+            </View>
+            <View style={styles.termItem}>
+              <View style={styles.termBullet} />
+              <Text style={styles.termText}>Both referrer and referee will receive ₹100 after the first successful appointment</Text>
+            </View>
+            <View style={styles.termItem}>
+              <View style={styles.termBullet} />
+              <Text style={styles.termText}>Reward will be credited within 24 hours of appointment completion</Text>
+            </View>
+            <View style={styles.termItem}>
+              <View style={styles.termBullet} />
+              <Text style={styles.termText}>Maximum 10 referrals per user</Text>
+            </View>
+            <View style={styles.termItem}>
+              <View style={styles.termBullet} />
+              <Text style={styles.termText}>Su Stylo Salon reserves the right to modify or terminate this program</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Bottom Padding */}
+        <View style={{ height: 20 }} />
       </ScrollView>
+
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={handleShare}
+        activeOpacity={0.9}
+      >
+        <LinearGradient
+          colors={colors.primaryGradient}
+          style={styles.floatingButtonGradient}
+        >
+          <FontAwesome5 name="share-alt" size={20} color="#FFFFFF" />
+          <Text style={styles.floatingButtonText}>Share Now</Text>
+        </LinearGradient>
+      </TouchableOpacity>
     </View>
   )
 }
@@ -457,75 +366,44 @@ export default function ReferEarnScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: COLORS.background,
+    paddingVertical: 6, // Reduced from 12
+  },
+  headerContainer: {
+    backgroundColor: "#F9F9F9",
     borderBottomWidth: 1,
     borderBottomColor: "#EEEEEE",
+    paddingBottom: 2,
   },
   backButton: {
-    padding: 4,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: COLORS.text,
+    fontSize: 18, // Reduced from 20
+    fontWeight: "700",
+    color: '#263238',
   },
   scrollView: {
     flex: 1,
   },
-  content: {
-    padding: 16,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: COLORS.textLight,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  errorText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: COLORS.error,
-    textAlign: "center",
-  },
-  retryButton: {
-    marginTop: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: COLORS.primary,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: COLORS.light,
-    fontWeight: "600",
-  },
   heroContainer: {
-    marginBottom: 24,
+    margin: 16,
     borderRadius: 16,
-    overflow: "hidden",
+    overflow: 'hidden',
     ...Platform.select({
       ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
       },
       android: {
         elevation: 4,
@@ -534,89 +412,150 @@ const styles = StyleSheet.create({
   },
   heroGradient: {
     borderRadius: 16,
-    overflow: "hidden",
+    padding: 20,
+    alignItems: 'center',
   },
   heroImage: {
-    width: "100%",
-    height: 180,
-    opacity: 0.6,
+    width: 120,
+    height: 120,
+    marginBottom: 16,
   },
-  heroContent: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 20,
+  heroTextContainer: {
+    alignItems: 'center',
   },
   heroTitle: {
     fontSize: 24,
-    fontWeight: "700",
-    color: COLORS.light,
+    fontWeight: "800",
+    color: colors.primary,
     marginBottom: 8,
+    textAlign: 'center',
   },
   heroSubtitle: {
     fontSize: 16,
-    color: COLORS.light,
-    opacity: 0.9,
+    color: colors.text,
+    textAlign: 'center',
+    lineHeight: 22,
   },
-  codeContainer: {
-    marginBottom: 20,
+  referralCodeContainer: {
+    margin: 16,
+    marginTop: 0,
+    padding: 20,
+    backgroundColor: colors.cardBg,
+    borderRadius: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
-  codeLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: COLORS.text,
+  referralCodeLabel: {
+    fontSize: 14,
+    color: colors.textLight,
     marginBottom: 12,
   },
-  codeWrapper: {
-    alignItems: "center",
+  codeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   codeBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: COLORS.light,
-    borderWidth: 1,
-    borderColor: "#EEEEEE",
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    width: "100%",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  codeText: {
+  codeCharBox: {
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+  },
+  codeChar: {
     fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.text,
-    letterSpacing: 1,
+    fontWeight: '700',
+    color: colors.primary,
   },
   copyButton: {
-    padding: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
   },
-  copiedMessage: {
-    fontSize: 12,
-    color: COLORS.success,
-    marginTop: 8,
+  copyButtonText: {
+    color: colors.cardBg,
+    fontWeight: '600',
+    marginLeft: 6,
   },
-  shareContainer: {
-    marginBottom: 24,
+  sectionContainer: {
+    margin: 16,
+    marginTop: 0,
+    marginBottom: 16,
   },
-  shareButton: {
-    borderRadius: 12,
-    overflow: "hidden",
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 16,
+  },
+  stepContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    alignItems: 'flex-start',
+  },
+  stepNumberContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  stepNumber: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  stepContent: {
+    flex: 1,
+  },
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  stepDescription: {
+    fontSize: 14,
+    color: colors.textLight,
+    lineHeight: 20,
+  },
+  shareOptionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+  },
+  shareOption: {
+    alignItems: 'center',
+    width: width / 4 - 16,
+    marginBottom: 16,
+  },
+  shareIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
     ...Platform.select({
       ios: {
-        shadowColor: "#000",
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -626,217 +565,125 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  shareButtonGradient: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 16,
-    borderRadius: 12,
-  },
-  shareButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: COLORS.light,
-    marginLeft: 8,
+  shareOptionText: {
+    fontSize: 12,
+    color: colors.textLight,
   },
   statsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 24,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: COLORS.light,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-    marginHorizontal: 4,
+    margin: 16,
+    marginTop: 0,
+    padding: 20,
+    backgroundColor: colors.cardBg,
+    borderRadius: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     ...Platform.select({
       ios: {
-        shadowColor: "#000",
+        shadowColor: colors.primary,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: 6,
       },
       android: {
-        elevation: 2,
+        elevation: 3,
       },
     }),
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
   },
   statValue: {
     fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.text,
+    fontWeight: '700',
+    color: colors.primary,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: COLORS.textLight,
+    color: colors.textLight,
+    textAlign: 'center',
   },
-  sectionContainer: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: COLORS.text,
-    marginBottom: 16,
-  },
-  howItWorksContainer: {
-    backgroundColor: COLORS.light,
-    borderRadius: 12,
-    padding: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  stepContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 16,
-  },
-  stepNumberContainer: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: COLORS.primary + "20",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  stepNumber: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: COLORS.primary,
-  },
-  stepText: {
-    flex: 1,
-    fontSize: 14,
-    color: COLORS.text,
-    lineHeight: 20,
-  },
-  referralHistoryContainer: {
-    backgroundColor: COLORS.light,
-    borderRadius: 12,
-    overflow: "hidden",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  referralItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#EEEEEE",
-  },
-  referralUserInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  referralAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary + "20",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  referralAvatarText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: COLORS.primary,
-  },
-  referralDetails: {
-    flex: 1,
-  },
-  referralName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: COLORS.text,
-  },
-  referralDate: {
-    fontSize: 12,
-    color: COLORS.textLight,
-    marginTop: 2,
-  },
-  referralStatusContainer: {
-    alignItems: "flex-end",
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginBottom: 4,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  referralCredits: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: COLORS.success,
-  },
-  emptyReferralsContainer: {
-    backgroundColor: COLORS.light,
-    borderRadius: 12,
-    padding: 24,
-    alignItems: "center",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  emptyReferralsText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: COLORS.text,
-    marginTop: 12,
-  },
-  emptyReferralsSubtext: {
-    fontSize: 14,
-    color: COLORS.textLight,
-    marginTop: 4,
-    textAlign: "center",
+  statDivider: {
+    width: 1,
+    height: '80%',
+    backgroundColor: colors.divider,
+    alignSelf: 'center',
   },
   termsContainer: {
-    marginTop: 8,
-    marginBottom: 24,
+    margin: 16,
+    marginTop: 0,
+    padding: 20,
+    backgroundColor: colors.cardBg,
+    borderRadius: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
-  termsText: {
-    fontSize: 12,
-    color: COLORS.textLight,
-    textAlign: "center",
+  termsTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 12,
+  },
+  termsList: {
+
+  },
+  termItem: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    alignItems: 'flex-start',
+  },
+  termBullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.primary,
+    marginTop: 6,
+    marginRight: 8,
+  },
+  termText: {
+    flex: 1,
+    fontSize: 13,
+    color: colors.textLight,
     lineHeight: 18,
   },
-  termsLink: {
-    color: COLORS.primary,
-    textDecorationLine: "underline",
+  floatingButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    borderRadius: 30,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
-})
+  floatingButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+  },
+  floatingButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+});

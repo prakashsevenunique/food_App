@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react"
+import React, { useRef, useEffect, useState, useContext } from "react"
 import {
   View,
   Text,
@@ -16,6 +16,8 @@ import * as Haptics from "expo-haptics"
 import { router } from "expo-router"
 import { useFocusEffect } from "@react-navigation/native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { UserContext } from "@/hooks/userInfo"
+import { imageBaseUrl } from "@/utils/helpingData"
 
 // Food Delivery color palette
 const COLORS = {
@@ -58,7 +60,13 @@ const MENU_ITEMS = [
     icon: "receipt-outline",
     route: "/orders",
   },
-    {
+  {
+    id: "offers",
+    title: "Offers",
+    icon: "pricetags-outline",
+    route: "/profileDetails/offers",
+  },
+  {
     id: "refer",
     title: "Refer and Earn",
     icon: "wallet-outline",
@@ -85,41 +93,24 @@ const MENU_ITEMS = [
 ]
 
 export default function ProfileScreen() {
-  const insets = useSafeAreaInsets()
-  const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const [logoutModalVisible, setLogoutModalVisible] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+  const { userInfo } = useContext(UserContext) as any;
 
-  // Animation values
+  console.log("userInfo", userInfo);
+
   const fadeAnim = useRef(new Animated.Value(0)).current
   const modalScaleAnim = useRef(new Animated.Value(0.9)).current
 
-  // Fetch user data
-  const fetchUserData = async () => {
-    setLoading(true)
-    try {
-      // In a real app, this would be an API call
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setUser(USER_DATA)
-    } catch (error) {
-      console.error("Error fetching user data:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Initialize animations
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 300,
       useNativeDriver: true,
     }).start()
-  }, [loading])
+  }, [])
 
-  // Animate modal when it becomes visible
   useEffect(() => {
     if (logoutModalVisible) {
       Animated.spring(modalScaleAnim, {
@@ -133,13 +124,6 @@ export default function ProfileScreen() {
     }
   }, [logoutModalVisible])
 
-  // Fetch data when screen is focused
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchUserData()
-      return () => { }
-    }, []),
-  )
 
   const handleMenuItemPress = (route) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
@@ -162,7 +146,7 @@ export default function ProfileScreen() {
       setLogoutModalVisible(false)
       setTimeout(() => {
         router.replace("/login")
-      }, 300)
+      }, 100)
     } catch (error) {
       console.error("Error during logout:", error)
       Alert.alert("Logout Error", "There was a problem logging out. Please try again.")
@@ -171,7 +155,6 @@ export default function ProfileScreen() {
     }
   }
 
-  // Render logout confirmation modal
   const renderLogoutModal = () => (
     <Modal
       animationType="fade"
@@ -222,18 +205,6 @@ export default function ProfileScreen() {
     </Modal>
   )
 
-  if (loading) {
-    return (
-      <View className="flex-1 bg-white justify-center items-center">
-        <View className="absolute top-0 left-0 right-0 bg-white px-4 border-b border-gray-100">
-          <Text className="text-xl font-bold text-[#3D4152] py-5">Profile</Text>
-        </View>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-        <Text className="mt-2 text-[#93959F]">Loading profile...</Text>
-      </View>
-    )
-  }
-
   return (
     <View className="flex-1 bg-white">
       <View
@@ -251,15 +222,16 @@ export default function ProfileScreen() {
         <Animated.View className="px-4 py-6 border-b border-gray-100" style={{ opacity: fadeAnim }}>
           <View className="flex-row items-center">
             <TouchableOpacity onPress={() => handleMenuItemPress("/profileDetails/edit")} className="relative">
-              <Image source={{ uri: user?.profileImage }} className="w-16 h-16 rounded-full" />
+              <Image source={{ uri: imageBaseUrl + "/" + userInfo.profilePicture }} className="w-16 h-16 rounded-full" />
               <View className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-sm">
                 <Ionicons name="camera" size={14} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
 
             <View className="ml-4 flex-1">
-              <Text className="text-lg font-bold text-[#3D4152]">{user?.name}</Text>
-              <Text className="text-sm text-[#93959F]">{user?.email}</Text>
+              <Text className="text-lg font-bold text-[#3D4152]">{userInfo?.fullName}</Text>
+              <Text className="text-sm text-[#93959F]">{userInfo?.email}</Text>
+              <Text className="text-sm text-[#93959F]">{userInfo?.mobileNumber}</Text>
             </View>
 
             <TouchableOpacity onPress={() => handleMenuItemPress("/profileDetails/edit")} className="p-2">

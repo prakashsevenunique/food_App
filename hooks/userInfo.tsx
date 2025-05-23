@@ -81,6 +81,8 @@ export const UserProvider = ({ children }: any) => {
                 },
             };
             const response = await axiosInstance.get('/api/users/profile', config);
+
+            console.log("userInfo", response.data);
             setUserInfo(response.data?.user);
         } catch (error: any) {
             Alert.alert(error.response?.data?.message || 'Something went wrong!');
@@ -170,7 +172,7 @@ export const UserProvider = ({ children }: any) => {
             getAuthToken();
         }
         if (token) {
-            // fetchUserInfo();
+            fetchUserInfo();
         }
     }, [token]);
 

@@ -394,7 +394,7 @@ export default function Home() {
         >
           <View className="flex-row justify-between items-center px-4 mb-3">
             <Text className="text-lg font-bold text-gray-800">Best Offers For You</Text>
-            <TouchableOpacity onPress={() => triggerHaptic("light")}>
+            <TouchableOpacity onPress={() =>{triggerHaptic("light");router.push("/(app)/profileDetails/offers")}}>
               <Text className="text-sm" style={{ color: COLORS.primary }}>
                 See all
               </Text>

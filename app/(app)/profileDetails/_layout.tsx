@@ -67,6 +67,13 @@ export default function ProfileLayout() {
           presentation: 'modal'
         }}
       />
+      <Stack.Screen
+        name="offers"
+        options={{
+          headerShown: false,
+          presentation: 'modal'
+        }}
+      />
     </Stack>
   );
 }
